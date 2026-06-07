@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const login = useLogin({
@@ -18,10 +18,11 @@ export default function Login() {
         localStorage.setItem("codeai_token", data.token);
         setLocation("/dashboard");
       },
-      onError: () => {
+      onError: (error: any) => {
+        const msg = error?.response?.data?.error || "이메일 또는 비밀번호가 틀렸습니다.";
         toast({
-          title: "Login failed",
-          description: "Invalid credentials.",
+          title: "로그인 실패",
+          description: msg,
           variant: "destructive",
         });
       },
@@ -30,7 +31,7 @@ export default function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login.mutate({ data: { username, password } });
+    login.mutate({ data: { email, password } });
   };
 
   return (
@@ -40,24 +41,25 @@ export default function Login() {
           <div className="w-16 h-16 rounded-2xl bg-primary mx-auto mb-6 flex items-center justify-center text-primary-foreground font-black text-3xl">
             C
           </div>
-          <h1 className="text-3xl font-black text-primary tracking-tight">Access Terminal</h1>
-          <p className="text-muted-foreground mt-2 font-medium">Authenticate to continue</p>
+          <h1 className="text-3xl font-black text-primary tracking-tight">로그인</h1>
+          <p className="text-muted-foreground mt-2 font-medium">이메일로 로그인하세요</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-3">
-            <Label htmlFor="username" className="text-lg font-bold text-foreground">Username</Label>
+            <Label htmlFor="email" className="text-lg font-bold text-foreground">이메일</Label>
             <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="rounded-2xl border-2 border-border bg-input h-14 px-4 text-lg font-mono focus-visible:ring-primary"
-              placeholder="root"
+              placeholder="you@example.com"
               required
             />
           </div>
           <div className="flex flex-col gap-3">
-            <Label htmlFor="password" className="text-lg font-bold text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-lg font-bold text-foreground">비밀번호</Label>
             <Input
               id="password"
               type="password"
@@ -73,13 +75,13 @@ export default function Login() {
             className="w-full h-16 rounded-2xl text-xl font-black mt-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all border-2 border-transparent"
             disabled={login.isPending}
           >
-            {login.isPending ? "Authenticating..." : "INITIALIZE"}
+            {login.isPending ? "로그인 중..." : "로그인"}
           </Button>
         </form>
 
         <div className="text-center">
           <p className="text-muted-foreground font-medium">
-            New operative? <Link href="/register" className="text-primary hover:underline font-bold">Register here</Link>
+            계정이 없으신가요? <Link href="/register" className="text-primary hover:underline font-bold">회원가입</Link>
           </p>
         </div>
       </div>

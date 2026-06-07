@@ -41265,29 +41265,27 @@ var coerce = {
 var HealthCheckResponse = objectType({
   "status": stringType()
 });
-var registerBodyUsernameMin = 3;
 var registerBodyPasswordMin = 6;
 var RegisterBody = objectType({
-  "username": stringType().min(registerBodyUsernameMin),
+  "email": stringType().email(),
   "password": stringType().min(registerBodyPasswordMin)
 });
-var loginBodyUsernameMin = 3;
 var loginBodyPasswordMin = 6;
 var LoginBody = objectType({
-  "username": stringType().min(loginBodyUsernameMin),
+  "email": stringType().email(),
   "password": stringType().min(loginBodyPasswordMin)
 });
 var LoginResponse = objectType({
   "token": stringType(),
   "user": objectType({
     "id": numberType(),
-    "username": stringType(),
+    "email": stringType(),
     "createdAt": coerce.date()
   })
 });
 var GetMeResponse = objectType({
   "id": numberType(),
-  "username": stringType(),
+  "email": stringType(),
   "createdAt": coerce.date()
 });
 var LogoutResponse = objectType({
@@ -61524,7 +61522,7 @@ var createInsertSchema = (entity, refine2) => {
 // ../../lib/db/src/schema/users.ts
 var usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull()
 });
@@ -61600,71 +61598,71 @@ function signToken(userId) {
 // src/routes/auth.ts
 var router2 = (0, import_express2.Router)();
 router2.post("/register", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password || username.length < 3 || password.length < 6) {
-    res.status(400).json({ error: "Username must be 3+ chars, password 6+ chars" });
+  const { email: email3, password } = req.body;
+  if (!email3 || !password || !email3.includes("@") || password.length < 6) {
+    res.status(400).json({ error: "\uC720\uD6A8\uD55C \uC774\uBA54\uC77C\uACFC 6\uC790 \uC774\uC0C1 \uBE44\uBC00\uBC88\uD638\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4" });
     return;
   }
   try {
-    const existing = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
+    const existing = await db.select().from(usersTable).where(eq(usersTable.email, email3.toLowerCase())).limit(1);
     if (existing.length > 0) {
-      res.status(400).json({ error: "Username already taken" });
+      res.status(400).json({ error: "\uC774\uBBF8 \uC0AC\uC6A9 \uC911\uC778 \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4" });
       return;
     }
     const passwordHash = await bcryptjs_default.hash(password, 10);
-    const [user] = await db.insert(usersTable).values({ username, passwordHash }).returning();
+    const [user] = await db.insert(usersTable).values({ email: email3.toLowerCase(), passwordHash }).returning();
     const token = signToken(user.id);
     res.status(201).json({
       token,
-      user: { id: user.id, username: user.username, createdAt: user.createdAt }
+      user: { id: user.id, email: user.email, createdAt: user.createdAt }
     });
   } catch (err) {
     req.log.error(err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "\uC11C\uBC84 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4" });
   }
 });
 router2.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    res.status(400).json({ error: "Username and password required" });
+  const { email: email3, password } = req.body;
+  if (!email3 || !password) {
+    res.status(400).json({ error: "\uC774\uBA54\uC77C\uACFC \uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694" });
     return;
   }
   try {
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email3.toLowerCase())).limit(1);
     if (!user) {
-      res.status(401).json({ error: "Invalid credentials" });
+      res.status(401).json({ error: "\uC774\uBA54\uC77C \uB610\uB294 \uBE44\uBC00\uBC88\uD638\uAC00 \uD2C0\uB838\uC2B5\uB2C8\uB2E4" });
       return;
     }
     const valid = await bcryptjs_default.compare(password, user.passwordHash);
     if (!valid) {
-      res.status(401).json({ error: "Invalid credentials" });
+      res.status(401).json({ error: "\uC774\uBA54\uC77C \uB610\uB294 \uBE44\uBC00\uBC88\uD638\uAC00 \uD2C0\uB838\uC2B5\uB2C8\uB2E4" });
       return;
     }
     const token = signToken(user.id);
     res.json({
       token,
-      user: { id: user.id, username: user.username, createdAt: user.createdAt }
+      user: { id: user.id, email: user.email, createdAt: user.createdAt }
     });
   } catch (err) {
     req.log.error(err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "\uC11C\uBC84 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4" });
   }
 });
 router2.get("/me", authMiddleware, async (req, res) => {
   try {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, req.userId)).limit(1);
     if (!user) {
-      res.status(401).json({ error: "User not found" });
+      res.status(401).json({ error: "\uC0AC\uC6A9\uC790\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4" });
       return;
     }
-    res.json({ id: user.id, username: user.username, createdAt: user.createdAt });
+    res.json({ id: user.id, email: user.email, createdAt: user.createdAt });
   } catch (err) {
     req.log.error(err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "\uC11C\uBC84 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4" });
   }
 });
 router2.post("/logout", authMiddleware, (_req, res) => {
-  res.json({ message: "Logged out successfully" });
+  res.json({ message: "\uB85C\uADF8\uC544\uC6C3 \uB418\uC5C8\uC2B5\uB2C8\uB2E4" });
 });
 var auth_default = router2;
 

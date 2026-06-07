@@ -19,14 +19,12 @@ export const HealthCheckResponse = zod.object({
 /**
  * @summary Register new user
  */
-export const registerBodyUsernameMin = 3;
-
 export const registerBodyPasswordMin = 6;
 
 
 
 export const RegisterBody = zod.object({
-  "username": zod.string().min(registerBodyUsernameMin),
+  "email": zod.string().email(),
   "password": zod.string().min(registerBodyPasswordMin)
 })
 
@@ -34,14 +32,12 @@ export const RegisterBody = zod.object({
 /**
  * @summary Login
  */
-export const loginBodyUsernameMin = 3;
-
 export const loginBodyPasswordMin = 6;
 
 
 
 export const LoginBody = zod.object({
-  "username": zod.string().min(loginBodyUsernameMin),
+  "email": zod.string().email(),
   "password": zod.string().min(loginBodyPasswordMin)
 })
 
@@ -49,7 +45,7 @@ export const LoginResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
   "id": zod.number(),
-  "username": zod.string(),
+  "email": zod.string(),
   "createdAt": zod.coerce.date()
 })
 })
@@ -60,7 +56,7 @@ export const LoginResponse = zod.object({
  */
 export const GetMeResponse = zod.object({
   "id": zod.number(),
-  "username": zod.string(),
+  "email": zod.string(),
   "createdAt": zod.coerce.date()
 })
 

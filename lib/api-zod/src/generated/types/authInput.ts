@@ -7,8 +7,7 @@
  */
 
 export interface AuthInput {
-  /** @minLength 3 */
-  username: string;
+  email: string;
   /** @minLength 6 */
   password: string;
 }

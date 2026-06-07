@@ -85,7 +85,7 @@ export function Layout({ children }: LayoutProps) {
             <Skeleton className="h-14 w-full rounded-2xl" />
           ) : user ? (
             <div className="flex items-center justify-between">
-              <div className="font-bold truncate">{user.username}</div>
+              <div className="font-bold truncate text-sm">{user.email}</div>
               <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-xl">
                 <LogOut className="w-5 h-5 text-destructive" />
               </Button>
@@ -122,7 +122,7 @@ export function Layout({ children }: LayoutProps) {
               <div className="mt-auto pt-6 border-t-2 border-border">
                 {user && (
                   <div className="flex items-center justify-between">
-                    <div className="font-bold truncate">{user.username}</div>
+                    <div className="font-bold truncate text-sm">{user.email}</div>
                     <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-xl">
                       <LogOut className="w-5 h-5 text-destructive" />
                     </Button>

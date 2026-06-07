@@ -334,11 +334,11 @@ components:
 
     AuthInput:
       type: object
-      required: [username, password]
+      required: [email, password]
       properties:
-        username:
+        email:
           type: string
-          minLength: 3
+          format: email
         password:
           type: string
           minLength: 6
@@ -354,11 +354,11 @@ components:
 
     User:
       type: object
-      required: [id, username, createdAt]
+      required: [id, email, createdAt]
       properties:
         id:
           type: integer
-        username:
+        email:
           type: string
         createdAt:
           type: string

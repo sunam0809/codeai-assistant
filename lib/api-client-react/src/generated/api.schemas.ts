@@ -10,15 +10,14 @@ export interface HealthStatus {
 }
 
 export interface AuthInput {
-  /** @minLength 3 */
-  username: string;
+  email: string;
   /** @minLength 6 */
   password: string;
 }
 
 export interface User {
   id: number;
-  username: string;
+  email: string;
   createdAt: string;
 }
 
