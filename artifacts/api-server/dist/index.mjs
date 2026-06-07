@@ -71810,7 +71810,7 @@ app.use("/api", routes_default);
 if (process.env.NODE_ENV === "production") {
   const frontendDist = path2.resolve(__dirname2, "../../codeai/dist/public");
   app.use(import_express7.default.static(frontendDist));
-  app.get("*", (_req, res) => {
+  app.get("/{*splat}", (_req, res) => {
     res.sendFile(path2.join(frontendDist, "index.html"));
   });
 }
